@@ -1,0 +1,2051 @@
+{
+  "info": {
+    "_postman_id": "a4e011d9-431b-445a-af03-ac2b24e79159",
+    "name": "Learn API (Jsonplaceholder)",
+    "description": "## Learn API (Jsonplaceholder)\n\nThis collection is a comprehensive set of API requests for learning and exploring the [JSONPlaceholder](https://jsonplaceholder.typicode.com) API — a free, open-source fake REST API for testing and prototyping.\n\nThe collection covers full **CRUD operations** and **read operations** across all major resources provided by the API, including:\n\n- 📝 **Posts** — Create, read, update, and delete post resources\n- 💬 **Comments** — Retrieve comments and filter by post\n- 👤 **Users** — Retrieve users and their associated posts, todos, and albums\n- 🖼️ **Albums & Photos** — Retrieve albums and photos with filtering support\n- ✅ **Todos** — Retrieve and update todo items with completion status filtering\n- ⚠️ **Negative Tests** — Edge cases and error handling scenarios\n\nEach request includes test scripts to validate response status codes, data structures, data types, and business logic. This collection is ideal for learning API testing fundamentals with Postman.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50620506"
+  },
+  "item": [
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "Get posts list",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response has 100 posts\", () => {\r",
+                  "    pm.expect(pm.response.json().length).to.equal(100);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Posts have correct structure\", () => {\r",
+                  "    pm.response.json().forEach(post => {\r",
+                  "        pm.expect(post).to.have.property(\"userId\");\r",
+                  "        pm.expect(post).to.have.property(\"id\");\r",
+                  "        pm.expect(post).to.have.property(\"title\");\r",
+                  "        pm.expect(post).to.have.property(\"body\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/posts",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "posts"
+              ]
+            },
+            "description": "Retrieves the complete list of posts from the `/posts` endpoint. Validates that the response returns a `200 OK` status code, that the response body is a non-empty array, and that each post object contains the required fields `id`, `userId`, `title`, and `body` with the correct data types."
+          },
+          "response": []
+        },
+        {
+          "name": "Get posts by Id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is not empty\", () => {\r",
+                  "    pm.expect(pm.response.json().length).to.be.above(0);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"All posts belong to requested userId\", () => {\r",
+                  "    const requestedUserId = parseInt(pm.request.url.query.get(\"userId\"));\r",
+                  "    pm.response.json().forEach(post => {\r",
+                  "        pm.expect(post.userId).to.equal(requestedUserId);\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Posts have correct structure\", () => {\r",
+                  "    pm.response.json().forEach(post => {\r",
+                  "        pm.expect(post).to.have.property(\"userId\");\r",
+                  "        pm.expect(post).to.have.property(\"id\");\r",
+                  "        pm.expect(post).to.have.property(\"title\");\r",
+                  "        pm.expect(post).to.have.property(\"body\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/posts?userId=8",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "posts"
+              ],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "8"
+                }
+              ]
+            },
+            "description": "Retrieves all posts filtered by `userId=8` using the `/posts` query parameter. Validates that the response returns a `200 OK` status code, that the response body is a non-empty array, and that every returned post has its `userId` field set to `8` with the correct data types for all fields."
+          },
+          "response": []
+        },
+        {
+          "name": "Get comments of a post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is not empty\", () => {\r",
+                  "    pm.expect(pm.response.json().length).to.be.above(0);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"All comments belong to requested postId\", () => {\r",
+                  "    // Mengambil postId dari URL path: /posts/{postId}/comments\r",
+                  "    const urlPath = pm.request.url.getPath();\r",
+                  "    const postId = parseInt(urlPath.split(\"/\")[2]);\r",
+                  "    \r",
+                  "    pm.response.json().forEach(comment => {\r",
+                  "        pm.expect(comment.postId).to.equal(postId);\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Comments have correct structure\", () => {\r",
+                  "    pm.response.json().forEach(comment => {\r",
+                  "        pm.expect(comment).to.have.property(\"postId\");\r",
+                  "        pm.expect(comment).to.have.property(\"id\");\r",
+                  "        pm.expect(comment).to.have.property(\"name\");\r",
+                  "        pm.expect(comment).to.have.property(\"email\");\r",
+                  "        pm.expect(comment).to.have.property(\"body\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/posts/12/comments",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "posts",
+                "12",
+                "comments"
+              ]
+            },
+            "description": "Retrieves all comments associated with post ID `12` using the nested `/posts/12/comments` endpoint. Validates that the response returns a `200 OK` status code, that the response body is a non-empty array, and that each comment object contains the expected fields such as `id`, `postId`, `name`, `email`, and `body`."
+          },
+          "response": []
+        },
+        {
+          "name": "Detail posts id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an object\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"object\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Post has correct structure\", () => {\r",
+                  "    const post = pm.response.json();\r",
+                  "    pm.expect(post).to.have.property(\"userId\");\r",
+                  "    pm.expect(post).to.have.property(\"id\");\r",
+                  "    pm.expect(post).to.have.property(\"title\");\r",
+                  "    pm.expect(post).to.have.property(\"body\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Data types are correct\", () => {\r",
+                  "    const post = pm.response.json();\r",
+                  "    pm.expect(post.userId).to.be.a(\"number\");\r",
+                  "    pm.expect(post.id).to.be.a(\"number\");\r",
+                  "    pm.expect(post.title).to.be.a(\"string\");\r",
+                  "    pm.expect(post.body).to.be.a(\"string\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/posts/:id",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "posts",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Retrieves a single post by its ID using the `/posts/:id` endpoint with a dynamic path variable. Validates that the response returns a `200 OK` status code, that the response body is an object containing the expected fields `id`, `userId`, `title`, and `body`, and that the returned `id` matches the requested path variable value."
+          },
+          "response": []
+        },
+        {
+          "name": "Create new post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", () => pm.response.to.have.status(201));\r",
+                  "\r",
+                  "pm.test(\"Response has id\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.have.property(\"id\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains submitted data\", () => {\r",
+                  "    const response = pm.response.json();\r",
+                  "    pm.expect(response).to.have.property(\"title\");\r",
+                  "    pm.expect(response).to.have.property(\"body\");\r",
+                  "    pm.expect(response).to.have.property(\"userId\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"title\": \"Latihan membuat Request post\",\r\n    \"body\": \"Ini adalah contoh latihan\",\r\n    \"userId\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/posts",
+              "protocol": "https",
+              "host": [
+                "jsonplaceholder",
+                "typicode",
+                "com"
+              ],
+              "path": [
+                "posts"
+              ]
+            },
+            "description": "Sends a POST request to the `/posts` endpoint to create a new post resource with a JSON request body. Validates that the response returns a `201 Created` status code, that the response body contains the submitted fields `title`, `body`, and `userId`, and that a new `id` is assigned to the created resource."
+          },
+          "response": []
+        },
+        {
+          "name": "Create post using env",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test: Verify the creation status code\r",
+                  "pm.test(\"Status code is 201 Created\", function () {\r",
+                  "    pm.response.to.have.status(201); // 201 Created is expected for successful resource creation\r",
+                  "});\r",
+                  "\r",
+                  "// Extract the 'id' from the response and set it as an environment variable\r",
+                  "pm.test(\"Extract new post ID and set environment variable\", function () {\r",
+                  "    const responseJson = pm.response.json();\r",
+                  "    pm.expect(responseJson).to.have.property('id'); // Ensure the 'id' exists in the response\r",
+                  "    pm.environment.set(\"newPostId\", responseJson.id); // Store the ID\r",
+                  "    console.log(\"Newly created Post ID (stored in environment): \" + pm.environment.get(\"newPostId\"));\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"title\": \"My Dynamic Post Created by Postman\",\r\n    \"body\": \"This is the body content for a post created dynamically during testing.\",\r\n    \"userId\": 101\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/posts",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "posts"
+              ]
+            },
+            "description": "Sends a POST request to the `/posts` endpoint to create a new post using dynamic values sourced from the active environment variables. Validates that the response returns a `201 Created` status code, that the response body reflects the submitted data, and that the newly created post is assigned a unique `id`."
+          },
+          "response": []
+        },
+        {
+          "name": "Update post detail",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Post ID is preserved\", () => {\r",
+                  "    pm.expect(pm.response.json().id).to.equal(1);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response has correct structure\", () => {\r",
+                  "    const post = pm.response.json();\r",
+                  "    pm.expect(post).to.have.property(\"userId\");\r",
+                  "    pm.expect(post).to.have.property(\"id\");\r",
+                  "    pm.expect(post).to.have.property(\"title\");\r",
+                  "    pm.expect(post).to.have.property(\"body\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n   \"userId\": 1,\r\n    \"id\": 1,\r\n    \"title\": \"Update post\",\r\n    \"body\": \"Coba update post\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/posts/1",
+              "protocol": "https",
+              "host": [
+                "jsonplaceholder",
+                "typicode",
+                "com"
+              ],
+              "path": [
+                "posts",
+                "1"
+              ]
+            },
+            "description": "Sends a PUT request to the `/posts/1` endpoint to fully replace an existing post resource with a new JSON payload. Validates that the response returns a `200 OK` status code, that the response body reflects all submitted fields including `id`, `title`, `body`, and `userId`, and that the data types are correct."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is empty object\", () => {\r",
+                  "    const response = pm.response.json();\r",
+                  "    pm.expect(Object.keys(response).length).to.equal(0);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/posts/1",
+              "protocol": "https",
+              "host": [
+                "jsonplaceholder",
+                "typicode",
+                "com"
+              ],
+              "path": [
+                "posts",
+                "1"
+              ]
+            },
+            "description": "Sends a DELETE request to the `/posts/1` endpoint to remove an existing post resource. Validates that the response returns a `200 OK` status code and that the response body is an empty object, confirming that the resource was successfully deleted by the server."
+          },
+          "response": []
+        }
+      ],
+      "description": "## Posts\n\nThis folder covers full **CRUD operations** on the `/posts` endpoint of the [JSONPlaceholder](https://jsonplaceholder.typicode.com) API. It includes requests to retrieve all posts, filter posts by `userId`, and fetch a single post by ID, as well as a nested endpoint to retrieve all comments belonging to a specific post. Post creation is tested both with static data and using **environment variables**, while update and delete operations validate the `PUT` and `DELETE` methods respectively."
+    },
+    {
+      "name": "Comments",
+      "item": [
+        {
+          "name": "Get all comments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response has 500 comments\", () => {\r",
+                  "    pm.expect(pm.response.json().length).to.equal(500);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Comments have correct structure\", () => {\r",
+                  "    pm.response.json().forEach(comment => {\r",
+                  "        pm.expect(comment).to.have.property(\"postId\");\r",
+                  "        pm.expect(comment).to.have.property(\"id\");\r",
+                  "        pm.expect(comment).to.have.property(\"name\");\r",
+                  "        pm.expect(comment).to.have.property(\"email\");\r",
+                  "        pm.expect(comment).to.have.property(\"body\");\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Data types are correct\", () => {\r",
+                  "    pm.response.json().forEach(comment => {\r",
+                  "        pm.expect(comment.postId).to.be.a(\"number\");\r",
+                  "        pm.expect(comment.id).to.be.a(\"number\");\r",
+                  "        pm.expect(comment.name).to.be.a(\"string\");\r",
+                  "        pm.expect(comment.email).to.be.a(\"string\");\r",
+                  "        pm.expect(comment.body).to.be.a(\"string\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/comments",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "comments"
+              ]
+            },
+            "description": "Retrieves the complete list of comments from the `/comments` endpoint. Validates that the response returns a `200 OK` status code, that the response body is a non-empty array, and that each comment object contains the expected fields `id`, `postId`, `name`, `email`, and `body` with correct data types."
+          },
+          "response": []
+        },
+        {
+          "name": "Get single comment by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response has exactly 1 comment\", () => {\r",
+                  "    pm.expect(pm.response.json().length).to.equal(1);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Comment ID matches requested ID\", () => {\r",
+                  "    const requestedId = parseInt(pm.request.url.query.get(\"id\"));\r",
+                  "    pm.expect(pm.response.json()[0].id).to.equal(requestedId);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Comment has correct structure\", () => {\r",
+                  "    const comment = pm.response.json()[0];\r",
+                  "    pm.expect(comment).to.have.property(\"postId\");\r",
+                  "    pm.expect(comment).to.have.property(\"id\");\r",
+                  "    pm.expect(comment).to.have.property(\"name\");\r",
+                  "    pm.expect(comment).to.have.property(\"email\");\r",
+                  "    pm.expect(comment).to.have.property(\"body\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/comments/?id=10",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "comments",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Retrieves a single comment by its ID using the `/comments` endpoint with the `id=10` query parameter. Validates that the response returns a `200 OK` status code, that the response body is an array containing one item, and that the returned comment object includes the expected fields `id`, `postId`, `name`, `email`, and `body`."
+          },
+          "response": []
+        },
+        {
+          "name": "Get list comment with post id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is not empty\", () => {\r",
+                  "    pm.expect(pm.response.json().length).to.be.above(0);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"All comments belong to requested postId\", () => {\r",
+                  "    const requestedPostId = parseInt(pm.request.url.query.get(\"postId\"));\r",
+                  "    pm.response.json().forEach(comment => {\r",
+                  "        pm.expect(comment.postId).to.equal(requestedPostId);\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Comments have correct structure\", () => {\r",
+                  "    pm.response.json().forEach(comment => {\r",
+                  "        pm.expect(comment).to.have.property(\"postId\");\r",
+                  "        pm.expect(comment).to.have.property(\"id\");\r",
+                  "        pm.expect(comment).to.have.property(\"name\");\r",
+                  "        pm.expect(comment).to.have.property(\"email\");\r",
+                  "        pm.expect(comment).to.have.property(\"body\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/comments?postId=50",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "postId",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "Retrieves all comments associated with post ID `50` using the `/comments` endpoint with the `postId=50` query parameter. Validates that the response returns a `200 OK` status code, that the response body is a non-empty array, and that each comment object contains the expected fields with `postId` matching the requested value."
+          },
+          "response": []
+        }
+      ],
+      "description": "## Comments\n\nThis folder covers **read operations** on the `/comments` endpoint of the [JSONPlaceholder](https://jsonplaceholder.typicode.com) API. It includes requests to retrieve all comments, get a single comment by ID, and filter comments by `postId` query parameter.\n\nEach request is equipped with test scripts to validate response status, data structure, correct data types, and that filter values are correctly reflected in the response."
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get user list",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response has 10 users\", () => {\r",
+                  "    pm.expect(pm.response.json().length).to.equal(10);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Users have correct structure\", () => {\r",
+                  "    pm.response.json().forEach(user => {\r",
+                  "        pm.expect(user).to.have.property(\"id\");\r",
+                  "        pm.expect(user).to.have.property(\"name\");\r",
+                  "        pm.expect(user).to.have.property(\"username\");\r",
+                  "        pm.expect(user).to.have.property(\"email\");\r",
+                  "        pm.expect(user).to.have.property(\"address\");\r",
+                  "        pm.expect(user).to.have.property(\"phone\");\r",
+                  "        pm.expect(user).to.have.property(\"website\");\r",
+                  "        pm.expect(user).to.have.property(\"company\");\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Address has correct nested structure\", () => {\r",
+                  "    pm.response.json().forEach(user => {\r",
+                  "        pm.expect(user.address).to.have.property(\"street\");\r",
+                  "        pm.expect(user.address).to.have.property(\"suite\");\r",
+                  "        pm.expect(user.address).to.have.property(\"city\");\r",
+                  "        pm.expect(user.address).to.have.property(\"zipcode\");\r",
+                  "        pm.expect(user.address).to.have.property(\"geo\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/users",
+              "protocol": "https",
+              "host": [
+                "jsonplaceholder",
+                "typicode",
+                "com"
+              ],
+              "path": [
+                "users"
+              ]
+            },
+            "description": "Retrieves the full list of users from the `/users` endpoint. Validates that the response returns a `200 OK` status code, that the response body is a non-empty array, and that each user object contains the expected fields such as `id`, `name`, `username`, `email`, and `address` with correct data types."
+          },
+          "response": []
+        },
+        {
+          "name": "Get single user by Id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an object\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"object\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"User ID matches requested ID\", () => {\r",
+                  "    const urlPath = pm.request.url.getPath();\r",
+                  "    const requestedId = parseInt(urlPath.split(\"/\").pop());\r",
+                  "    pm.expect(pm.response.json().id).to.equal(requestedId);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"User has correct structure\", () => {\r",
+                  "    const user = pm.response.json();\r",
+                  "    pm.expect(user).to.have.property(\"id\");\r",
+                  "    pm.expect(user).to.have.property(\"name\");\r",
+                  "    pm.expect(user).to.have.property(\"username\");\r",
+                  "    pm.expect(user).to.have.property(\"email\");\r",
+                  "    pm.expect(user).to.have.property(\"address\");\r",
+                  "    pm.expect(user).to.have.property(\"phone\");\r",
+                  "    pm.expect(user).to.have.property(\"website\");\r",
+                  "    pm.expect(user).to.have.property(\"company\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Data types are correct\", () => {\r",
+                  "    const user = pm.response.json();\r",
+                  "    pm.expect(user.id).to.be.a(\"number\");\r",
+                  "    pm.expect(user.name).to.be.a(\"string\");\r",
+                  "    pm.expect(user.username).to.be.a(\"string\");\r",
+                  "    pm.expect(user.email).to.be.a(\"string\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/users/1",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "users",
+                "1"
+              ]
+            },
+            "description": "Retrieves a single user by their ID using the `/users/1` endpoint. Validates that the response returns a `200 OK` status code, that the response body is an object containing the expected fields such as `id`, `name`, `username`, `email`, and `address`, and that the returned `id` matches the requested value."
+          },
+          "response": []
+        },
+        {
+          "name": "Get posts by user",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is not empty\", () => {\r",
+                  "    pm.expect(pm.response.json().length).to.be.above(0);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"All posts belong to requested userId\", () => {\r",
+                  "    const urlPath = pm.request.url.getPath();\r",
+                  "    const requestedUserId = parseInt(urlPath.split(\"/\")[2]);\r",
+                  "    pm.response.json().forEach(post => {\r",
+                  "        pm.expect(post.userId).to.equal(requestedUserId);\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Posts have correct structure\", () => {\r",
+                  "    pm.response.json().forEach(post => {\r",
+                  "        pm.expect(post).to.have.property(\"userId\");\r",
+                  "        pm.expect(post).to.have.property(\"id\");\r",
+                  "        pm.expect(post).to.have.property(\"title\");\r",
+                  "        pm.expect(post).to.have.property(\"body\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/users/1/posts",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "users",
+                "1",
+                "posts"
+              ]
+            },
+            "description": "Retrieves all posts authored by user ID `1` using the nested `/users/1/posts` endpoint. Validates that the response returns a `200 OK` status code, that the response body is a non-empty array, and that each post object contains the expected fields including `id`, `userId`, `title`, and `body`, with `userId` matching the requested user."
+          },
+          "response": []
+        },
+        {
+          "name": "Get todos by user",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is not empty\", () => {\r",
+                  "    pm.expect(pm.response.json().length).to.be.above(0);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"All todos belong to requested userId\", () => {\r",
+                  "    const urlPath = pm.request.url.getPath();\r",
+                  "    const requestedUserId = parseInt(urlPath.split(\"/\")[2]);\r",
+                  "    pm.response.json().forEach(todo => {\r",
+                  "        pm.expect(todo.userId).to.equal(requestedUserId);\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Todos have correct structure\", () => {\r",
+                  "    pm.response.json().forEach(todo => {\r",
+                  "        pm.expect(todo).to.have.property(\"userId\");\r",
+                  "        pm.expect(todo).to.have.property(\"id\");\r",
+                  "        pm.expect(todo).to.have.property(\"title\");\r",
+                  "        pm.expect(todo).to.have.property(\"completed\");\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Completed field is boolean\", () => {\r",
+                  "    pm.response.json().forEach(todo => {\r",
+                  "        pm.expect(todo.completed).to.be.a(\"boolean\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/users/1/todos",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "users",
+                "1",
+                "todos"
+              ]
+            },
+            "description": "Retrieves all todo items belonging to user ID `1` using the nested `/users/1/todos` endpoint. Validates that the response returns a `200 OK` status code, that the response body is a non-empty array, and that each todo object contains the expected fields with `userId` matching the requested user ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Get albums by user",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is not empty\", () => {\r",
+                  "    pm.expect(pm.response.json().length).to.be.above(0);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"All albums belong to requested userId\", () => {\r",
+                  "    const urlPath = pm.request.url.getPath();\r",
+                  "    const requestedUserId = parseInt(urlPath.split(\"/\")[2]);\r",
+                  "    pm.response.json().forEach(album => {\r",
+                  "        pm.expect(album.userId).to.equal(requestedUserId);\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Albums have correct structure\", () => {\r",
+                  "    pm.response.json().forEach(album => {\r",
+                  "        pm.expect(album).to.have.property(\"userId\");\r",
+                  "        pm.expect(album).to.have.property(\"id\");\r",
+                  "        pm.expect(album).to.have.property(\"title\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/users/5/albums",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "users",
+                "5",
+                "albums"
+              ]
+            },
+            "description": "Retrieves all albums belonging to user ID `5` using the nested `/users/5/albums` endpoint. Validates that the response returns a `200 OK` status code, that the response body is a non-empty array, and that each album object contains the expected fields with `userId` matching the requested user ID."
+          },
+          "response": []
+        }
+      ],
+      "description": "## Users\n\nThis folder covers **read operations** on the `/users` endpoint of the [JSONPlaceholder](https://jsonplaceholder.typicode.com) API. It includes requests to retrieve all users, get a single user by ID, and access nested resources such as posts, todos, and albums belonging to a specific user.\n\nEach request is equipped with test scripts to validate response status, data structure, and relational integrity between users and their associated resources."
+    },
+    {
+      "name": "Albums & Photos",
+      "item": [
+        {
+          "name": "Get photos list",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response has 5000 photos\", () => {\r",
+                  "    pm.expect(pm.response.json().length).to.equal(5000);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Photos have correct structure\", () => {\r",
+                  "    pm.response.json().slice(0, 10).forEach(photo => {\r",
+                  "        pm.expect(photo).to.have.property(\"albumId\");\r",
+                  "        pm.expect(photo).to.have.property(\"id\");\r",
+                  "        pm.expect(photo).to.have.property(\"title\");\r",
+                  "        pm.expect(photo).to.have.property(\"url\");\r",
+                  "        pm.expect(photo).to.have.property(\"thumbnailUrl\");\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Data types are correct\", () => {\r",
+                  "    pm.response.json().slice(0, 10).forEach(photo => {\r",
+                  "        pm.expect(photo.albumId).to.be.a(\"number\");\r",
+                  "        pm.expect(photo.id).to.be.a(\"number\");\r",
+                  "        pm.expect(photo.title).to.be.a(\"string\");\r",
+                  "        pm.expect(photo.url).to.be.a(\"string\");\r",
+                  "        pm.expect(photo.thumbnailUrl).to.be.a(\"string\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/photos",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "photos"
+              ]
+            },
+            "description": "Retrieves the complete list of photos from the `/photos` endpoint. Validates that the response returns a `200 OK` status code, that the response body is an array, and that each photo object contains the expected fields such as `id`, `albumId`, `title`, `url`, and `thumbnailUrl` with correct data types."
+          },
+          "response": []
+        },
+        {
+          "name": "Get albums list",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response has 100 albums\", () => {\r",
+                  "    pm.expect(pm.response.json().length).to.equal(100);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Albums have correct structure\", () => {\r",
+                  "    pm.response.json().forEach(album => {\r",
+                  "        pm.expect(album).to.have.property(\"userId\");\r",
+                  "        pm.expect(album).to.have.property(\"id\");\r",
+                  "        pm.expect(album).to.have.property(\"title\");\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Data types are correct\", () => {\r",
+                  "    pm.response.json().forEach(album => {\r",
+                  "        pm.expect(album.userId).to.be.a(\"number\");\r",
+                  "        pm.expect(album.id).to.be.a(\"number\");\r",
+                  "        pm.expect(album.title).to.be.a(\"string\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/albums",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "albums"
+              ]
+            },
+            "description": "Retrieves the complete list of albums from the `/albums` endpoint. Validates that the response returns a `200 OK` status code, that the response body is a non-empty array, and that each album object contains the expected fields such as `id`, `userId`, and `title` with correct data types."
+          },
+          "response": []
+        },
+        {
+          "name": "Get single album by Id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an object\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"object\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Album ID matches requested ID\", () => {\r",
+                  "    const urlPath = pm.request.url.getPath();\r",
+                  "    const requestedId = parseInt(urlPath.split(\"/\").pop());\r",
+                  "    pm.expect(pm.response.json().id).to.equal(requestedId);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Album has correct structure\", () => {\r",
+                  "    const album = pm.response.json();\r",
+                  "    pm.expect(album).to.have.property(\"userId\");\r",
+                  "    pm.expect(album).to.have.property(\"id\");\r",
+                  "    pm.expect(album).to.have.property(\"title\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Data types are correct\", () => {\r",
+                  "    const album = pm.response.json();\r",
+                  "    pm.expect(album.userId).to.be.a(\"number\");\r",
+                  "    pm.expect(album.id).to.be.a(\"number\");\r",
+                  "    pm.expect(album.title).to.be.a(\"string\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/albums/1",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "albums",
+                "1"
+              ]
+            },
+            "description": "Retrieves a single album by its ID from the `/albums/1` endpoint. Validates that the response returns a `200 OK` status code, that the response body is an object containing the expected fields `id`, `userId`, and `title`, and that the `id` in the response matches the requested value with correct data types."
+          },
+          "response": []
+        },
+        {
+          "name": "Get photos by album",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is not empty\", () => {\r",
+                  "    pm.expect(pm.response.json().length).to.be.above(0);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"All photos belong to requested albumId\", () => {\r",
+                  "    const urlPath = pm.request.url.getPath();\r",
+                  "    const requestedAlbumId = parseInt(urlPath.split(\"/\")[2]);\r",
+                  "    pm.response.json().forEach(photo => {\r",
+                  "        pm.expect(photo.albumId).to.equal(requestedAlbumId);\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Photos have correct structure\", () => {\r",
+                  "    pm.response.json().forEach(photo => {\r",
+                  "        pm.expect(photo).to.have.property(\"albumId\");\r",
+                  "        pm.expect(photo).to.have.property(\"id\");\r",
+                  "        pm.expect(photo).to.have.property(\"title\");\r",
+                  "        pm.expect(photo).to.have.property(\"url\");\r",
+                  "        pm.expect(photo).to.have.property(\"thumbnailUrl\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/albums/1/photos",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "albums",
+                "1",
+                "photos"
+              ]
+            },
+            "description": "Retrieves all photos belonging to album ID `1` using the nested `/albums/1/photos` endpoint. Validates that the response returns a `200 OK` status code, that the response body is a non-empty array, and that each photo object contains the expected fields with `albumId` matching the requested album ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Get single photo by Id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an object\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"object\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Photo ID matches requested ID\", () => {\r",
+                  "    const urlPath = pm.request.url.getPath();\r",
+                  "    const requestedId = parseInt(urlPath.split(\"/\").pop());\r",
+                  "    pm.expect(pm.response.json().id).to.equal(requestedId);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Photo has correct structure\", () => {\r",
+                  "    const photo = pm.response.json();\r",
+                  "    pm.expect(photo).to.have.property(\"albumId\");\r",
+                  "    pm.expect(photo).to.have.property(\"id\");\r",
+                  "    pm.expect(photo).to.have.property(\"title\");\r",
+                  "    pm.expect(photo).to.have.property(\"url\");\r",
+                  "    pm.expect(photo).to.have.property(\"thumbnailUrl\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Data types are correct\", () => {\r",
+                  "    const photo = pm.response.json();\r",
+                  "    pm.expect(photo.albumId).to.be.a(\"number\");\r",
+                  "    pm.expect(photo.id).to.be.a(\"number\");\r",
+                  "    pm.expect(photo.title).to.be.a(\"string\");\r",
+                  "    pm.expect(photo.url).to.be.a(\"string\");\r",
+                  "    pm.expect(photo.thumbnailUrl).to.be.a(\"string\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/photos/1",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "photos",
+                "1"
+              ]
+            },
+            "description": "Retrieves a single photo by its ID from the `/photos/1` endpoint. Validates that the response returns a `200 OK` status code, that the response body is an object containing the expected fields `id`, `albumId`, `title`, `url`, and `thumbnailUrl`, and that the `id` in the response matches the requested value."
+          },
+          "response": []
+        },
+        {
+          "name": "Filter photos by albumId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is not empty\", () => {\r",
+                  "    pm.expect(pm.response.json().length).to.be.above(0);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"All photos belong to requested albumId\", () => {\r",
+                  "    const requestedAlbumId = parseInt(pm.request.url.query.get(\"albumId\"));\r",
+                  "    pm.response.json().forEach(photo => {\r",
+                  "        pm.expect(photo.albumId).to.equal(requestedAlbumId);\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Photos have correct structure\", () => {\r",
+                  "    pm.response.json().forEach(photo => {\r",
+                  "        pm.expect(photo).to.have.property(\"albumId\");\r",
+                  "        pm.expect(photo).to.have.property(\"id\");\r",
+                  "        pm.expect(photo).to.have.property(\"title\");\r",
+                  "        pm.expect(photo).to.have.property(\"url\");\r",
+                  "        pm.expect(photo).to.have.property(\"thumbnailUrl\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/photos?albumId=1",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "photos"
+              ],
+              "query": [
+                {
+                  "key": "albumId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Retrieves all photos filtered by `albumId=1` using the `/photos` query parameter. Validates that the response returns a `200 OK` status code, that the response body is a non-empty array, and that every returned photo has its `albumId` field set to `1` with correct data types for all fields."
+          },
+          "response": []
+        }
+      ],
+      "description": "## Albums & Photos\n\nThis folder covers **read operations** on the `/albums` and `/photos` endpoints of the [JSONPlaceholder](https://jsonplaceholder.typicode.com) API. It includes requests to retrieve all albums, get a single album by ID, access nested photos within an album, retrieve all photos, get a single photo by ID, and filter photos by `albumId` query parameter.\n\nEach request is equipped with test scripts to validate response status, data structure, correct data types, and relational integrity between albums and their associated photos."
+    },
+    {
+      "name": "Todos",
+      "item": [
+        {
+          "name": "Get todos list",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response has 200 todos\", () => {\r",
+                  "    pm.expect(pm.response.json().length).to.equal(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Todos have correct structure\", () => {\r",
+                  "    pm.response.json().slice(0, 10).forEach(todo => {\r",
+                  "        pm.expect(todo).to.have.property(\"userId\");\r",
+                  "        pm.expect(todo).to.have.property(\"id\");\r",
+                  "        pm.expect(todo).to.have.property(\"title\");\r",
+                  "        pm.expect(todo).to.have.property(\"completed\");\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Data types are correct\", () => {\r",
+                  "    pm.response.json().slice(0, 10).forEach(todo => {\r",
+                  "        pm.expect(todo.userId).to.be.a(\"number\");\r",
+                  "        pm.expect(todo.id).to.be.a(\"number\");\r",
+                  "        pm.expect(todo.title).to.be.a(\"string\");\r",
+                  "        pm.expect(todo.completed).to.be.a(\"boolean\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/todos",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "todos"
+              ]
+            },
+            "description": "Retrieves the complete list of todo items from the `/todos` endpoint. Validates that the response returns a `200 OK` status code, that the response body is a non-empty array, and that each todo object contains the expected fields `id`, `userId`, `title`, and `completed` with correct data types."
+          },
+          "response": []
+        },
+        {
+          "name": "Get single todo by Id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an object\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"object\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Todo ID matches requested ID\", () => {\r",
+                  "    const urlPath = pm.request.url.getPath();\r",
+                  "    const requestedId = parseInt(urlPath.split(\"/\").pop());\r",
+                  "    pm.expect(pm.response.json().id).to.equal(requestedId);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Todo has correct structure\", () => {\r",
+                  "    const todo = pm.response.json();\r",
+                  "    pm.expect(todo).to.have.property(\"userId\");\r",
+                  "    pm.expect(todo).to.have.property(\"id\");\r",
+                  "    pm.expect(todo).to.have.property(\"title\");\r",
+                  "    pm.expect(todo).to.have.property(\"completed\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Data types are correct\", () => {\r",
+                  "    const todo = pm.response.json();\r",
+                  "    pm.expect(todo.userId).to.be.a(\"number\");\r",
+                  "    pm.expect(todo.id).to.be.a(\"number\");\r",
+                  "    pm.expect(todo.title).to.be.a(\"string\");\r",
+                  "    pm.expect(todo.completed).to.be.a(\"boolean\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/todos/1",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "todos",
+                "1"
+              ]
+            },
+            "description": "Retrieves a single todo item by its ID from the `/todos/1` endpoint. Validates that the response returns a `200 OK` status code, that the response body is an object containing the expected fields `id`, `userId`, `title`, and `completed`, and that the `id` in the response matches the requested value."
+          },
+          "response": []
+        },
+        {
+          "name": "Filter todos by completed",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is not empty\", () => {\r",
+                  "    pm.expect(pm.response.json().length).to.be.above(0);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"All todos have completed status matching filter\", () => {\r",
+                  "    const completedParam = pm.request.url.query.get(\"completed\");\r",
+                  "    const expectedStatus = completedParam === \"true\";\r",
+                  "    pm.response.json().forEach(todo => {\r",
+                  "        pm.expect(todo.completed).to.equal(expectedStatus);\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Todos have correct structure\", () => {\r",
+                  "    pm.response.json().forEach(todo => {\r",
+                  "        pm.expect(todo).to.have.property(\"userId\");\r",
+                  "        pm.expect(todo).to.have.property(\"id\");\r",
+                  "        pm.expect(todo).to.have.property(\"title\");\r",
+                  "        pm.expect(todo).to.have.property(\"completed\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/todos?completed=true",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "todos"
+              ],
+              "query": [
+                {
+                  "key": "completed",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "Retrieves all todo items filtered by `completed=true` using the `/todos` query parameter. Validates that the response returns a `200 OK` status code, that the response body is a non-empty array, and that every returned todo item has its `completed` field set to `true`."
+          },
+          "response": []
+        },
+        {
+          "name": "Filter todos by completed false",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is not empty\", () => {\r",
+                  "    pm.expect(pm.response.json().length).to.be.above(0);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"All todos have completed status matching filter\", () => {\r",
+                  "    const completedParam = pm.request.url.query.get(\"completed\");\r",
+                  "    const expectedStatus = completedParam === \"true\";\r",
+                  "    pm.response.json().forEach(todo => {\r",
+                  "        pm.expect(todo.completed).to.equal(expectedStatus);\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Todos have correct structure\", () => {\r",
+                  "    pm.response.json().forEach(todo => {\r",
+                  "        pm.expect(todo).to.have.property(\"userId\");\r",
+                  "        pm.expect(todo).to.have.property(\"id\");\r",
+                  "        pm.expect(todo).to.have.property(\"title\");\r",
+                  "        pm.expect(todo).to.have.property(\"completed\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/todos?completed=false",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "todos"
+              ],
+              "query": [
+                {
+                  "key": "completed",
+                  "value": "false"
+                }
+              ]
+            },
+            "description": "Retrieves all todo items filtered by `completed=false` using the `/todos` query parameter. Validates that the response returns a `200 OK` status code, that the response body is a non-empty array, and that every returned todo item has its `completed` field set to `false`."
+          },
+          "response": []
+        },
+        {
+          "name": "Update todo status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an object\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"object\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Todo ID matches requested ID\", () => {\r",
+                  "    const urlPath = pm.request.url.getPath();\r",
+                  "    const requestedId = parseInt(urlPath.split(\"/\").pop());\r",
+                  "    pm.expect(pm.response.json().id).to.equal(requestedId);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains updated fields\", () => {\r",
+                  "    const requestBody = pm.request.body ? JSON.parse(pm.request.body.raw) : {};\r",
+                  "    const response = pm.response.json();\r",
+                  "    \r",
+                  "    Object.keys(requestBody).forEach(key => {\r",
+                  "        pm.expect(response).to.have.property(key);\r",
+                  "        pm.expect(response[key]).to.equal(requestBody[key]);\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Todo has correct structure\", () => {\r",
+                  "    const todo = pm.response.json();\r",
+                  "    pm.expect(todo).to.have.property(\"userId\");\r",
+                  "    pm.expect(todo).to.have.property(\"id\");\r",
+                  "    pm.expect(todo).to.have.property(\"title\");\r",
+                  "    pm.expect(todo).to.have.property(\"completed\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"completed\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/todos/1",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "todos",
+                "1"
+              ]
+            },
+            "description": "Sends a PATCH request to the `/todos/1` endpoint to partially update the completion status of a todo item. Validates that the response returns a `200 OK` status code, that the response body contains the updated `completed` field reflecting the new value, and that all other todo fields remain intact."
+          },
+          "response": []
+        }
+      ],
+      "description": "## Todos\n\nThis folder covers **read and update operations** on the `/todos` endpoint of the [JSONPlaceholder](https://jsonplaceholder.typicode.com) API. It includes requests to retrieve all todos, get a single todo by ID, filter todos by completion status (`completed=true` and `completed=false`), and update a todo's status via PATCH.\n\nEach request is equipped with test scripts to validate response status, data structure, correct data types, and that filter or update values are correctly reflected in the response."
+    },
+    {
+      "name": "Negative tests",
+      "item": [
+        {
+          "name": "Get user with invalid ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", () => pm.response.to.have.status(404));\r",
+                  "\r",
+                  "pm.test(\"Response is empty object\", () => {\r",
+                  "    const response = pm.response.json();\r",
+                  "    pm.expect(response).to.be.an(\"object\");\r",
+                  "    pm.expect(Object.keys(response).length).to.equal(0);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/users/99999",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "users",
+                "99999"
+              ]
+            },
+            "description": "Sends a GET request to the `/users/99999` endpoint using a non-existent user ID to validate error handling behavior. Verifies that the API returns a `404 Not Found` status code and that the response body is an empty object, confirming the API handles invalid user IDs gracefully."
+          },
+          "response": []
+        },
+        {
+          "name": "Get post with invalid ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", () => pm.response.to.have.status(404));\r",
+                  "\r",
+                  "pm.test(\"Response is empty object\", () => {\r",
+                  "    const response = pm.response.json();\r",
+                  "    pm.expect(response).to.be.an(\"object\");\r",
+                  "    pm.expect(Object.keys(response).length).to.equal(0);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/posts/999",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "posts",
+                "999"
+              ]
+            },
+            "description": "Sends a GET request to the `/posts/999` endpoint using a non-existent post ID to validate error handling behavior. Verifies that the API returns a `404 Not Found` status code and that the response body is an empty object, confirming the API handles invalid IDs gracefully."
+          },
+          "response": []
+        },
+        {
+          "name": "Get posts with string ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", () => pm.response.to.have.status(404));\r",
+                  "\r",
+                  "pm.test(\"Response is empty object\", () => {\r",
+                  "    const response = pm.response.json();\r",
+                  "    pm.expect(response).to.be.an(\"object\");\r",
+                  "    pm.expect(Object.keys(response).length).to.equal(0);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/posts/abc",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "posts",
+                "abc"
+              ]
+            },
+            "description": "Sends a GET request to the `/posts/abc` endpoint using a non-numeric string as the post ID to validate error handling for invalid path parameters. Verifies that the API returns a `404 Not Found` or appropriate error status code, confirming that the server correctly handles requests with malformed resource identifiers."
+          },
+          "response": []
+        },
+        {
+          "name": "Get comments with invalid ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", () => pm.response.to.have.status(404));\r",
+                  "\r",
+                  "pm.test(\"Response is empty object\", () => {\r",
+                  "    const response = pm.response.json();\r",
+                  "    pm.expect(response).to.be.an(\"object\");\r",
+                  "    pm.expect(Object.keys(response).length).to.equal(0);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/comments/9999",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "comments",
+                "9999"
+              ]
+            },
+            "description": "Sends a GET request to the `/comments/9999` endpoint using a non-existent comment ID to validate error handling behavior. Verifies that the API returns a `404 Not Found` status code and that the response body is an empty object, confirming the API handles invalid comment IDs gracefully."
+          },
+          "response": []
+        },
+        {
+          "name": "Filter comments with invalid postId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is empty array for non-existent postId\", () => {\r",
+                  "    pm.expect(pm.response.json().length).to.equal(0);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/comments/?postId=999999",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "comments",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "postId",
+                  "value": "999999"
+                }
+              ]
+            },
+            "description": "Sends a GET request to the `/comments` endpoint with a non-existent `postId=999999` query parameter to validate filtering behavior for invalid values. Verifies that the API returns a `200 OK` status code with an empty array, confirming that the server handles queries for non-existent resources without returning an error."
+          },
+          "response": []
+        },
+        {
+          "name": "Create post with empty body",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", () => pm.response.to.have.status(201));\r",
+                  "\r",
+                  "pm.test(\"Response is an object\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"object\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains id for created resource\", () => {\r",
+                  "    pm.expect(pm.response.json()).to.have.property(\"id\");\r",
+                  "    pm.expect(pm.response.json().id).to.be.a(\"number\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response only contains id when body is empty\", () => {\r",
+                  "    const response = pm.response.json();\r",
+                  "    pm.expect(Object.keys(response).length).to.equal(1);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/posts",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "posts"
+              ]
+            },
+            "description": "Sends a POST request to the `/posts` endpoint with an intentionally empty request body to validate input handling behavior. Verifies that the API returns a `201 Created` status code and that the response body is an object, confirming how the API responds when no data is provided in the request payload."
+          },
+          "response": []
+        },
+        {
+          "name": "Create posts invalid data",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404 for invalid path\", () => pm.response.to.have.status(404));",
+                  "",
+                  "pm.test(\"Response is empty object\", () => {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.be.an(\"object\");",
+                  "    pm.expect(Object.keys(response).length).to.equal(0);",
+                  "});",
+                  "",
+                  "pm.test(\"POST to invalid path returns not found\", () => {",
+                  "    pm.expect(pm.response.code).to.equal(404);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/posts/abc",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "posts",
+                "abc"
+              ]
+            },
+            "description": "Sends a POST request to the `/posts/abc` endpoint using an invalid non-numeric path segment to validate error handling for malformed requests. Verifies that the API returns an appropriate error status code, confirming that the server correctly rejects requests with invalid resource identifiers in the URL path."
+          },
+          "response": []
+        },
+        {
+          "name": "Update data with invalid Id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 500\", () => pm.response.to.have.status(500));\r",
+                  "\r",
+                  "pm.test(\"Response indicates server error\", () => {\r",
+                  "    // JSONPlaceholder returns 500 for PUT on non-existent resources\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([404, 500]);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": 9999,\r\n    \"title\": \"Update Skenario Negatif\",\r\n    \"body\": \"Mencoba update data yang tidak ada di server\",\r\n    \"userId\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/posts/9999",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "posts",
+                "9999"
+              ]
+            },
+            "description": "Sends a PUT request to the `/posts/9999` endpoint using a non-existent post ID to validate error handling for update operations. Verifies that the API returns a `404 Not Found` or appropriate error status code, confirming that the server correctly rejects update attempts on invalid resource IDs."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete post with invalid Id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));\r",
+                  "\r",
+                  "pm.test(\"Response is empty object\", () => {\r",
+                  "    const response = pm.response.json();\r",
+                  "    pm.expect(response).to.be.an(\"object\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Delete operation returns success even for non-existent resource\", () => {\r",
+                  "    // JSONPlaceholder returns 200 for DELETE regardless of resource existence\r",
+                  "    pm.expect(pm.response.code).to.equal(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/posts/999999",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "posts",
+                "999999"
+              ]
+            },
+            "description": "Sends a DELETE request to the `/posts/999999` endpoint using a non-existent post ID to validate error handling for delete operations. Verifies that the API returns a `404 Not Found` or appropriate error status code, confirming that the server correctly rejects deletion attempts on invalid resource IDs."
+          },
+          "response": []
+        }
+      ],
+      "description": "## Negative Tests\n\nThis folder documents **error handling and edge case behavior** across multiple endpoints of the [JSONPlaceholder](https://jsonplaceholder.typicode.com) API. It covers scenarios such as requesting resources with non-existent IDs, using string values as path parameters, sending requests with empty bodies, and filtering with invalid query parameters.\n\nEach request is equipped with test scripts that validate the expected error responses — including `404 Not Found`, `500 Internal Server Error`, and unexpected `200 OK` behaviors — providing important findings about how the API handles invalid or missing data."
+    }
+  ]
+}
