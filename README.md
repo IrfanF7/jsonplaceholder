@@ -15,6 +15,7 @@ covering full CRUD operations and negative test scenarios.
 - Postman (API Testing)
 - JSONPlaceholder (Mock REST API)
 - JavaScript (Test Scripts)
+- Postbot (AI Test Generator)
 
 ## ▶️ How to Run
 1. Import `collection.json` into Postman
